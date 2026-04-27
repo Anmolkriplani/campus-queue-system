@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+const Token = require("./token");
 let tokenCount = 0;
 let tokens = [];
 
