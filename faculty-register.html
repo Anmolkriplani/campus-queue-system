@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Faculty Register</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="faculty-page">
+
+  <div class="faculty-box">
+
+    <!-- LEFT -->
+    <div class="faculty-left">
+
+      <h1>Faculty Registration</h1>
+
+      <p>
+        Create an authorized faculty account
+        to manage campus queues efficiently.
+      </p>
+
+      <div class="faculty-badge">🏛️ Staff Access Setup</div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="faculty-right">
+
+      <div class="faculty-card">
+
+        <h2>Register</h2>
+
+        <input type="text" id="fname" placeholder="Full Name">
+
+        <input type="email" id="femail" placeholder="Official Email">
+
+        <input type="text" id="fdept" placeholder="Department">
+
+        <input type="text" id="fid" placeholder="Employee ID">
+
+        <input type="password" id="fpass" placeholder="Password">
+
+        <button onclick="facultyRegister()">Create Account</button>
+
+        <p id="facultyMsg"></p>
+
+        <a href="faculty-login.html">
+          Already registered? Login
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function facultyRegister() {
+
+  const name = document.getElementById("fname").value;
+  const email = document.getElementById("femail").value;
+  const dept = document.getElementById("fdept").value;
+  const id = document.getElementById("fid").value;
+  const pass = document.getElementById("fpass").value;
+
+  if(name && email && dept && id && pass){
+
+    document.getElementById("facultyMsg").innerText =
+      "Registration Successful";
+
+    setTimeout(() => {
+      window.location.href = "faculty-login.html";
+    }, 1000);
+
+  } else {
+
+    document.getElementById("facultyMsg").innerText =
+      "Please fill all fields";
+
+  }
+
+}
+</script>
+
+</body>
+</html>

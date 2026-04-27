@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Faculty Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="faculty-page">
+
+  <div class="faculty-box">
+
+    <div class="faculty-left">
+
+      <h1>Faculty Access Panel</h1>
+
+      <p>
+        Secure login for teachers, assistants
+        and office staff to manage queues.
+      </p>
+
+      <div class="faculty-badge">
+        🏛️ Authorized Personnel Only
+      </div>
+
+    </div>
+
+    <div class="faculty-right">
+
+      <div class="faculty-card">
+
+        <h2>Login</h2>
+
+        <input
+          type="email"
+          id="adminEmail"
+          placeholder="Official Email"
+        >
+
+        <input
+          type="password"
+          id="adminPassword"
+          placeholder="Password"
+        >
+
+        <button onclick="facultyLogin()">
+          Access Panel
+        </button>
+
+        <p id="adminMsg"></p>
+
+        <a href="faculty-register.html">
+          New faculty member? Register
+        </a>
+
+        <a href="portal.html">
+          ← Back to Portal
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function facultyLogin() {
+
+  const email =
+    document.getElementById("adminEmail").value;
+
+  const password =
+    document.getElementById("adminPassword").value;
+
+  if(
+    email === "admin@gmail.com" &&
+    password === "admin123"
+  ){
+
+    localStorage.setItem(
+      "adminEmail",
+      email
+    );
+
+    localStorage.setItem(
+      "adminName",
+      "Office Manager"
+    );
+
+    window.location.href =
+      "admin.html";
+
+  } else {
+
+    document.getElementById("adminMsg").innerText =
+      "Invalid faculty credentials";
+  }
+}
+</script>
+
+</body>
+</html>

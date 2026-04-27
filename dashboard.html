@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dash-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <h2>🌸 Queue</h2>
+
+    <a href="#top">🏠 Home</a>
+    <a href="#booking">🎟️ Book Token</a>
+    <a href="#queueSection">📋 Queue</a>
+    <a href="#profile">👤 Profile</a>
+
+    <a href="index.html" onclick="logoutUser()">
+      🚪 Logout
+    </a>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-panel">
+
+    <!-- TOP -->
+    <div class="top-header" id="top">
+      <h1>Welcome Back ✨</h1>
+      <p>Manage your campus bookings smoothly.</p>
+    </div>
+
+    <!-- NOTIFICATION -->
+    <div id="notifyBanner"></div>
+    <div id="announceBanner"></div>
+
+    <!-- STATS -->
+    <section class="stats-grid">
+
+      <div class="stat-box">
+        <h3>🎫 Current Token</h3>
+        <p id="result">None Yet</p>
+      </div>
+
+      <div class="stat-box">
+        <h3>📚 Office</h3>
+        <p id="officeText">Not Selected</p>
+      </div>
+
+      <div class="stat-box">
+        <h3>📋 Queue Count</h3>
+        <p id="queueCount">0</p>
+      </div>
+
+      <div class="stat-box">
+        <h3>⏳ My Status</h3>
+        <p id="myStatus">None</p>
+      </div>
+
+    </section>
+
+    <!-- BOOKING -->
+    <section class="action-panel" id="booking">
+
+      <h2>Book New Token 🌸</h2>
+
+      <select id="officeSelect" onchange="changeOffice()">
+        <option>Library</option>
+        <option>Fees Office</option>
+        <option>Admin Office</option>
+        <option>Hostel Office</option>
+        <option>Placement Cell</option>
+      </select>
+
+      <input
+        type="text"
+        id="reasonInput"
+        placeholder="Reason for visit (example: Need transcript)"
+      >
+
+      <div class="button-row">
+        <button onclick="bookToken()">🎟️ Book Token</button>
+        <button onclick="viewQueue()">🔄 Refresh Queue</button>
+        <button onclick="cancelMyBooking()">❌ Cancel Booking</button>
+      </div>
+
+    </section>
+
+    <!-- LIVE QUEUE -->
+    <section class="queue-panel" id="queueSection">
+
+      <h2>Live Queue Status ✨</h2>
+
+      <div id="queue">
+        No queue loaded yet.
+      </div>
+
+    </section>
+
+    <!-- PROFILE / HISTORY -->
+    <!-- PROFILE -->
+<section class="queue-panel" id="profile">
+
+  <h2>My Profile 🌸</h2>
+
+  <div class="profile-box">
+
+    <img
+      id="profilePic"
+      src="images/default-user.png"
+      class="profile-pic"
+    >
+
+    <input
+      type="file"
+      id="picUpload"
+      accept="image/*"
+      onchange="uploadPic()"
+    >
+
+    <p><strong>Name:</strong>
+      <span id="profileName">Student</span>
+    </p>
+
+    <p><strong>Email:</strong>
+      <span id="profileEmail">---</span>
+    </p>
+
+    <p><strong>Role:</strong> Student</p>
+
+  </div>
+
+</section>
+
+<!-- HISTORY -->
+<section class="queue-panel">
+
+  <h2>Booking History 🌸</h2>
+
+  <div id="history">
+    No history yet.
+  </div>
+
+</section>
+
+  </main>
+
+</div>
+
+<script>
+function changeOffice() {
+
+  const office =
+    document.getElementById("officeSelect").value;
+
+  document.getElementById("officeText").innerText =
+    office;
+}
+
+async function bookToken() {
+
+  const office =
+    document.getElementById("officeSelect").value;
+
+  const reason =
+    document.getElementById("reasonInput").value;
+
+  const studentEmail =
+    localStorage.getItem("studentEmail");
+
+  const response = await fetch(
+    "http://localhost:5000/api/tokens/book",
+    {
+      method: "POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        office: office,
+        reason: reason,
+        studentEmail: studentEmail
+      })
+    }
+  );
+
+  const data = await response.text();
+
+  document.getElementById("result").innerText =
+    data;
+
+  document.getElementById("myStatus").innerText =
+    "waiting";
+
+  viewQueue();
+}
+
+function startCountdown(callTime) {
+
+  const endTime =
+    Number(callTime) + (30 * 60 * 1000);
+
+  const timer = setInterval(() => {
+
+    const diff =
+      endTime - Date.now();
+
+    const box =
+      document.getElementById("countdown");
+
+    if(!box){
+      clearInterval(timer);
+      return;
+    }
+
+    if(diff <= 0){
+
+      box.innerText =
+        "Arrival time expired";
+
+      expireToken();
+
+      clearInterval(timer);
+      return;
+    }
+
+    const mins =
+      Math.floor(diff / 60000);
+
+    const secs =
+      Math.floor((diff % 60000) / 1000);
+
+    box.innerText =
+      mins + "m " + secs + "s remaining";
+
+  }, 1000);
+}
+
+async function expireToken() {
+
+  const tokenNumber =
+    document.getElementById("result").innerText;
+
+  await fetch(
+    "http://localhost:5000/api/tokens/expire",
+    {
+      method: "PUT",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        tokenNumber: tokenNumber
+      })
+    }
+  );
+
+  viewQueue();
+}
+
+async function cancelMyBooking() {
+
+  const studentEmail =
+    localStorage.getItem("studentEmail");
+
+  await fetch(
+    "http://localhost:5000/api/tokens/studentcancel",
+    {
+      method: "PUT",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        studentEmail: studentEmail
+      })
+    }
+  );
+
+  viewQueue();
+}
+function loadProfile() {
+
+  const email =
+    localStorage.getItem("studentEmail");
+
+  document.getElementById("profileEmail").innerText =
+    email || "---";
+
+  const savedPic =
+    localStorage.getItem("profilePic");
+
+  if(savedPic){
+    document.getElementById("profilePic").src =
+      savedPic;
+  }
+
+  const name =
+    localStorage.getItem("studentName");
+
+  if(name){
+    document.getElementById("profileName").innerText =
+      name;
+  }
+}
+function uploadPic() {
+
+  const file =
+    document.getElementById("picUpload").files[0];
+
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+
+    const img = e.target.result;
+
+    localStorage.setItem(
+      "profilePic",
+      img
+    );
+
+    document.getElementById("profilePic").src =
+      img;
+  };
+
+  reader.readAsDataURL(file);
+}
+function loadAnnouncement() {
+
+  const msg =
+    localStorage.getItem(
+      "campusAnnouncement"
+    );
+
+  document.getElementById(
+    "announceBanner"
+  ).innerText =
+    msg || "";
+}
+async function viewQueue() {
+
+  const response = await fetch(
+    "http://localhost:5000/api/tokens/all"
+  );
+
+  const data = await response.json();
+
+  const studentEmail =
+    localStorage.getItem("studentEmail");
+
+  let myToken = null;
+  let lastToken = null;
+  let historyText = "";
+  let count = 0;
+
+  data.forEach(token => {
+
+    if(token.studentEmail === studentEmail){
+
+      count++;
+      lastToken = token;
+
+      if(
+        token.status === "waiting" ||
+        token.status === "called"
+      ){
+        myToken = token;
+      }
+
+      historyText += `
+        <div class="queue-item">
+          <strong>${token.tokenNumber}</strong><br>
+          ${token.office}<br>
+          ${token.status}
+        </div>
+      `;
+    }
+
+  });
+
+  document.getElementById("queueCount").innerText =
+    count;
+
+  document.getElementById("history").innerHTML =
+    historyText || "No history yet.";
+
+  if(myToken){
+
+    document.getElementById("queue").innerHTML = `
+      <div class="queue-item">
+
+        <strong>🎟️ ${myToken.tokenNumber}</strong><br>
+        📍 ${myToken.office}<br>
+        📝 ${myToken.reason}<br>
+
+        <div class="wait-badge">
+          Estimated Time:
+          ${myToken.waitTime || "Pending"}
+        </div>
+
+        <br>
+
+        ⏳ ${myToken.status}
+
+        ${
+          myToken.status === "called"
+          ? `<div class="call-note">
+              Please arrive within 30 mins.<br>
+              <span id="countdown"></span>
+            </div>`
+          : ""
+        }
+
+      </div>
+    `;
+
+    if(
+      myToken.status === "called" &&
+      myToken.callTime
+    ){
+      startCountdown(myToken.callTime);
+    }
+
+    document.getElementById("result").innerText =
+      myToken.tokenNumber;
+
+    document.getElementById("myStatus").innerText =
+      myToken.status;
+
+    document.getElementById("officeText").innerText =
+      myToken.office;
+
+    let msg =
+      myToken.status === "called"
+      ? "Your token has been called. Please arrive soon."
+      : "Your booking is confirmed.";
+
+    document.getElementById("notifyBanner").innerText =
+      msg;
+
+  } else {
+
+    document.getElementById("queue").innerHTML =
+      "No active booking.";
+
+    document.getElementById("myStatus").innerText =
+      "No Active Token";
+
+    let msg = "";
+
+    if(lastToken){
+
+      if(lastToken.status === "completed"){
+        msg = "Your visit has been completed.";
+      }
+
+      if(lastToken.status === "cancelled"){
+        msg = "Your booking was cancelled.";
+      }
+
+      if(lastToken.status === "expired"){
+        msg = "Arrival time expired.";
+      }
+    }
+
+    document.getElementById("notifyBanner").innerText =
+      msg;
+  }
+}
+
+function logoutUser(){
+  localStorage.removeItem("studentEmail");
+}
+
+loadProfile();
+loadAnnouncement();
+viewQueue();
+setInterval(viewQueue, 3000);
+</script>
+
+</body>
+</html>

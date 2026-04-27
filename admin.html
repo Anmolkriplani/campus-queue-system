@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="admin-page">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+
+    <h2>🏛️ Admin</h2>
+
+    <a href="#top">Dashboard</a>
+    <a href="#adminQueue">Queue Control</a>
+    <a href="#adminQueue">Students</a>
+    <a href="#reports">Reports</a>
+    <a href="portal.html">Logout</a>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+
+    <div class="admin-top" id="top">
+
+      <h1>Queue Management Panel</h1>
+      <p>Manage campus service queues efficiently.</p>
+
+    </div>
+
+    <!-- STATS -->
+    <section class="admin-stats">
+
+      <input
+        type="text"
+        id="adminSearch"
+        placeholder="Search token, office, status..."
+        onkeyup="renderQueue()"
+        class="admin-search"
+      >
+
+      <div class="admin-card">
+        <h3>Total Tokens</h3>
+        <p id="totalCount">0</p>
+      </div>
+
+      <div class="admin-card">
+        <h3>Waiting</h3>
+        <p id="waitingCount">0</p>
+      </div>
+
+      <div class="admin-card">
+        <h3>Completed</h3>
+        <p id="doneCount">0</p>
+      </div>
+
+    </section>
+
+    <!-- ACTIONS -->
+    <section class="admin-actions">
+
+      <button onclick="loadQueue()">🔄 Load Queue</button>
+      <button onclick="callNext()">📢 Call Next</button>
+      <button onclick="markComplete()">✅ Complete</button>
+      <button onclick="cancelToken()">❌ Cancel</button>
+
+      <div class="wait-box">
+
+        <input
+          type="text"
+          id="tokenInput"
+          placeholder="Token Number (Q1)"
+        >
+
+        <input
+          type="text"
+          id="waitInput"
+          placeholder="Wait Time (20 mins / 2:30 PM)"
+        >
+
+        <button onclick="setWaitTime()">
+          Set Wait Time
+        </button>
+
+      </div>
+
+    </section>
+
+    <!-- REPORTS -->
+    <section class="admin-reports" id="reports">
+
+      <div class="report-card">
+        <h3>📊 Cancelled</h3>
+        <p id="cancelCount">0</p>
+      </div>
+
+      <div class="report-card">
+        <h3>🏢 Top Office</h3>
+        <p id="topOffice">None</p>
+      </div>
+
+    </section>
+    <section class="admin-reports">
+
+  <div class="report-card">
+
+    <h3>Admin Profile 🌸</h3>
+
+    <img
+      id="adminPic"
+      src="images/default-user.png"
+      class="profile-pic"
+    >
+
+    <input
+      type="file"
+      id="adminUpload"
+      accept="image/*"
+      onchange="uploadAdminPic()"
+    >
+
+    <p><strong>Name:</strong> <span id="adminName">Admin</span></p>
+
+    <p><strong>Email:</strong> <span id="adminEmail">---</span></p>
+
+    <p><strong>Role:</strong> Faculty</p>
+
+  </div>
+
+</section>
+<section class="admin-table-box">
+
+  <h2>Announcements 📢</h2>
+
+  <input
+    type="text"
+    id="announceInput"
+    placeholder="Write announcement..."
+  >
+
+  <button onclick="saveAnnouncement()">
+    Post Announcement
+  </button>
+
+</section>
+    <!-- QUEUES -->
+    <section class="admin-table-box">
+
+      <h2>Live Queue</h2>
+
+      <div id="adminQueue">
+        No data loaded.
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script>
+let queueData = [];
+
+async function callOffice(office) {
+
+  await fetch(
+    "/api/tokens/nextoffice",
+    {
+      method: "PUT",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({ office: office })
+    }
+  );
+
+  loadQueue();
+}
+
+async function completeOffice(office) {
+
+  await fetch(
+    "/api/tokens/completeoffice",
+    {
+      method: "PUT",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({ office: office })
+    }
+  );
+
+  loadQueue();
+}
+function loadAdminProfile() {
+
+  const email =
+    localStorage.getItem("adminEmail");
+
+  const name =
+    localStorage.getItem("adminName");
+
+  const pic =
+    localStorage.getItem("adminPic");
+
+  document.getElementById("adminEmail").innerText =
+    email || "---";
+
+  document.getElementById("adminName").innerText =
+    name || "Admin";
+
+  if(pic){
+    document.getElementById("adminPic").src =
+      pic;
+  }
+}
+
+function uploadAdminPic() {
+
+  const file =
+    document.getElementById("adminUpload").files[0];
+
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+
+    const img = e.target.result;
+
+    localStorage.setItem(
+      "adminPic",
+      img
+    );
+
+    document.getElementById("adminPic").src =
+      img;
+  };
+
+  reader.readAsDataURL(file);
+}
+function saveAnnouncement() {
+
+  const msg =
+    document.getElementById("announceInput").value;
+
+  localStorage.setItem(
+    "campusAnnouncement",
+    msg
+  );
+
+  alert("Announcement posted");
+}
+function toggleGroup(office) {
+
+  const safeOffice =
+    office.replace(/\s+/g, "-");
+
+  const box =
+    document.getElementById(
+      "group-" + safeOffice
+    );
+
+  if(!box) return;
+
+  if(box.style.display === "none"){
+    box.style.display = "block";
+  } else {
+    box.style.display = "none";
+  }
+}
+async function loadQueue() {
+
+  const response = await fetch(
+    "/api/tokens/all"
+  );
+
+  queueData = await response.json();
+
+  renderQueue();
+}
+
+function renderQueue() {
+
+  let waiting = 0;
+  let completed = 0;
+  let cancelled = 0;
+  let found = 0;
+
+  let officeStats = {};
+
+  const search =
+    document.getElementById("adminSearch")
+    .value
+    .toLowerCase()
+    .trim();
+
+  const groups = {
+    "Library": "",
+    "Fees Office": "",
+    "Admin Office": "",
+    "Hostel Office": "",
+    "Placement Cell": ""
+  };
+
+  queueData.forEach(token => {
+
+    const fullText =
+      (
+        token.tokenNumber + " " +
+        token.office + " " +
+        token.reason + " " +
+        token.status + " " +
+        (token.studentEmail || "")
+      ).toLowerCase();
+
+    if(search && !fullText.includes(search)){
+      return;
+    }
+
+    found++;
+
+    officeStats[token.office] =
+      (officeStats[token.office] || 0) + 1;
+
+    let cls = "";
+
+    if(token.status === "waiting"){
+      cls = "wait";
+      waiting++;
+    }
+
+    if(token.status === "called"){
+      cls = "call";
+    }
+
+    if(token.status === "completed"){
+      cls = "done";
+      completed++;
+    }
+
+    if(token.status === "cancelled"){
+      cls = "cancel";
+      cancelled++;
+    }
+
+    if(token.status === "expired"){
+      cls = "expired";
+    }
+
+    const card = `
+      <div class="admin-queue-item">
+        <strong>${token.tokenNumber}</strong><br>
+        ${token.reason}<br>
+        ${token.studentEmail || "Unknown"}<br>
+
+        <div class="wait-badge small">
+          ${token.waitTime}
+        </div>
+
+        <span class="status ${cls}">
+          ${token.status}
+        </span>
+      </div>
+    `;
+
+    if(groups[token.office] !== undefined){
+      groups[token.office] += card;
+    }
+
+  });
+
+  let text = "";
+
+  for(let office in groups){
+
+    text += `
+      <div class="queue-group">
+
+        <h3
+          onclick="toggleGroup('${office}')"
+          class="group-title"
+        >
+          ${office}
+
+          <span class="count-badge">
+            ${officeStats[office] || 0}
+          </span>
+        </h3>
+
+        <div id="group-${office.replace(/\s+/g,'-')}"
+     class="group-body">
+
+          <div class="office-actions">
+
+            <button
+              onclick="callOffice('${office}')"
+              class="mini-btn"
+            >
+              Call Next
+            </button>
+
+            <button
+              onclick="completeOffice('${office}')"
+              class="mini-btn done-btn"
+            >
+              Complete
+            </button>
+
+          </div>
+
+          ${
+            groups[office]
+            ? groups[office]
+            : "<p>No tokens</p>"
+          }
+
+        </div>
+
+      </div>
+    `;
+  }
+
+  if(found === 0){
+    text = "<p>No matching results found.</p>";
+  }
+
+  let topOffice = "None";
+  let max = 0;
+
+  for(let office in officeStats){
+    if(officeStats[office] > max){
+      max = officeStats[office];
+      topOffice = office;
+    }
+  }
+
+  document.getElementById("adminQueue").innerHTML =
+    text;
+
+  document.getElementById("totalCount").innerText =
+    queueData.length;
+
+  document.getElementById("waitingCount").innerText =
+    waiting;
+
+  document.getElementById("doneCount").innerText =
+    completed;
+
+  document.getElementById("cancelCount").innerText =
+    cancelled;
+
+  document.getElementById("topOffice").innerText =
+    topOffice;
+}
+async function callNext() {
+  await fetch(
+    "/api/tokens/next",
+    { method: "PUT" }
+  );
+  loadQueue();
+}
+
+async function markComplete() {
+  await fetch(
+    "/api/tokens/complete",
+    { method: "PUT" }
+  );
+  loadQueue();
+}
+
+async function cancelToken() {
+  await fetch(
+    "/api/tokens/cancel",
+    { method: "PUT" }
+  );
+  loadQueue();
+}
+
+async function setWaitTime() {
+
+  const tokenNumber =
+    document.getElementById("tokenInput").value;
+
+  const waitTime =
+    document.getElementById("waitInput").value;
+
+  await fetch(
+    "/api/tokens/waittime",
+    {
+      method: "PUT",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        tokenNumber: tokenNumber,
+        waitTime: waitTime
+      })
+    }
+  );
+
+  loadQueue();
+}
+
+loadAdminProfile();
+loadQueue();
+setInterval(loadQueue, 3000);
+</script>
+
+</body>
+</html>

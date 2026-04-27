@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="auth-page">
+
+  <!-- LEFT SIDE -->
+  <div class="auth-left">
+
+    <h1>Welcome Back ✨</h1>
+
+    <p>
+      Login to manage your queue bookings,
+      check token status and save time.
+    </p>
+
+    <img src="images/girl.png" class="auth-girl">
+
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="auth-right">
+
+    <div class="auth-card">
+
+      <h2>💖 Login</h2>
+
+      <input type="email" id="email" placeholder="Enter Email">
+
+      <input type="password" id="password" placeholder="Enter Password">
+
+      <button onclick="loginUser()">Login</button>
+
+      <p id="message"></p>
+
+      <a href="register.html">Create new account</a>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+async function loginUser() {
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+
+    const response = await fetch("http://localhost:5000/api/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password
+      })
+    });
+
+    const data = await response.text();
+
+    document.getElementById("message").innerText = data;
+if (data.trim() === "Login Successful") {
+
+  localStorage.setItem("studentEmail", email);
+
+  window.location.href = "dashboard.html";
+}
+
+  } catch (error) {
+
+    document.getElementById("message").innerText =
+      "Server connection error";
+
+  }
+
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="auth-page">
+
+  <!-- LEFT SIDE -->
+  <div class="auth-left">
+
+    <h1>Create Account 🌸</h1>
+
+    <p>
+      Join Campus Queue Booking and manage
+      your campus visits with ease.
+    </p>
+
+    <img src="images/girl.png" class="auth-girl">
+
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="auth-right">
+
+    <div class="auth-card">
+
+      <h2>💖 Register</h2>
+
+      <input type="text" id="name" placeholder="Full Name">
+
+      <input type="email" id="email" placeholder="College Email">
+
+      <input type="password" id="password" placeholder="Password">
+
+      <input type="number" id="age" placeholder="Age">
+
+      <input type="text" id="department" placeholder="Department">
+
+      <input type="text" id="studentid" placeholder="Student ID">
+
+      <button onclick="registerUser()">Create Account</button>
+
+      <p id="message"></p>
+
+      <a href="login.html">Already have an account?</a>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+async function registerUser() {
+
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const age = document.getElementById("age").value;
+  const department = document.getElementById("department").value;
+  const studentid = document.getElementById("studentid").value;
+
+  try {
+
+    const response = await fetch("/api/users/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        age,
+        department,
+        studentid
+      })
+    });
+
+    const data = await response.text();
+
+    document.getElementById("message").innerText = data;
+
+    if (data.trim() === "User Registered Successfully") {
+
+  localStorage.setItem(
+    "studentName",
+    name
+  );
+
+  window.location.href = "login.html";
+    }
+
+  } catch (error) {
+
+    document.getElementById("message").innerText =
+      "Server connection error";
+
+  }
+
+}
+</script>
+
+</body>
+</html>
