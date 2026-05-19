@@ -1,0 +1,273 @@
+/* ========================================
+   🌸 CAMPUSFLOW OS DESIGN SYSTEM
+======================================== */
+
+:root{
+
+  /* PRIMARY COLORS */
+  --primary:#7c3aed;
+  --primary-light:#a78bfa;
+  --primary-dark:#5b21b6;
+
+  /* BACKGROUNDS */
+  --bg-main:#f5f7ff;
+  --bg-card:rgba(255,255,255,.75);
+  --bg-sidebar:#ffffff;
+
+  /* TEXT */
+  --text-main:#1f2937;
+  --text-light:#6b7280;
+
+  /* STATUS COLORS */
+  --success:#22c55e;
+  --danger:#ef4444;
+  --warning:#f59e0b;
+  --info:#3b82f6;
+
+  /* UI */
+  --radius:24px;
+  --radius-small:14px;
+
+  --shadow-soft:
+    0 10px 30px rgba(0,0,0,.08);
+
+  --blur:blur(14px);
+
+  /* SPACING */
+  --space-xs:8px;
+  --space-sm:14px;
+  --space-md:20px;
+  --space-lg:30px;
+  --space-xl:45px;
+
+  /* TRANSITIONS */
+  --transition:.3s ease;
+}
+
+/* ========================================
+   🌙 DARK MODE VARIABLES
+======================================== */
+
+body.dark-mode{
+
+  --bg-main:#0f172a;
+  --bg-card:rgba(30,41,59,.8);
+  --bg-sidebar:#111827;
+
+  --text-main:#f9fafb;
+  --text-light:#cbd5e1;
+
+  --shadow-soft:
+    0 10px 30px rgba(0,0,0,.35);
+}
+
+/* ========================================
+   🌸 GLOBAL RESET
+======================================== */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+
+/* ========================================
+   🌸 REUSABLE CARDS
+======================================== */
+
+.glass-card{
+
+  background:var(--bg-card);
+
+  backdrop-filter:var(--blur);
+
+  border-radius:var(--radius);
+
+  padding:24px;
+
+  box-shadow:var(--shadow-soft);
+
+  border:
+    1px solid rgba(255,255,255,.2);
+
+  transition:var(--transition);
+}
+
+.glass-card:hover{
+  transform:translateY(-4px);
+  }
+
+/* ========================================
+   🌸 BUTTON SYSTEM
+======================================== */
+
+.btn{
+
+  border:none;
+
+  padding:14px 22px;
+
+  border-radius:16px;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+  transition:var(--transition);
+}
+
+.btn-primary{
+  background:var(--primary);
+  color:white;
+}
+
+.btn-primary:hover{
+  background:var(--primary-dark);
+  transform:translateY(-2px);
+}
+
+.btn-danger{
+  background:var(--danger);
+  color:white;
+}
+
+.btn-success{
+  background:var(--success);
+  color:white;
+}
+
+/* ========================================
+   🌸 INPUTS
+======================================== */
+
+
+
+.input-modern:focus{
+  transform:scale(1.01);
+}
+
+/* ========================================
+   🌸 SIDEBAR
+======================================== */
+
+.sidebar a,
+.admin-sidebar a{
+
+  border-radius:14px;
+
+  transition:var(--transition);
+}
+
+.sidebar a:hover,
+.admin-sidebar a:hover{
+
+  background:rgba(124,58,237,.12);
+
+  transform:translateX(5px);
+}
+
+/* ========================================
+   🌸 DASHBOARD WIDGETS
+======================================== */
+
+
+.stat-box:hover,
+.admin-card:hover,
+.report-card:hover{
+
+  transform:translateY(-5px);
+  }
+
+/* ========================================
+   🌸 TOAST PLACEHOLDER
+======================================== */
+
+.toast{
+
+  position:fixed;
+
+  top:20px;
+  right:20px;
+
+  background:var(--bg-card);
+
+  padding:16px 20px;
+
+  border-radius:18px;
+
+  box-shadow:var(--shadow-soft);
+
+  z-index:9999;
+}
+
+/* ========================================
+   🌸 MOBILE
+======================================== */
+
+@media(max-width:768px){
+
+  body{
+    padding-bottom:80px;
+  }
+
+  .sidebar,
+  .admin-sidebar{
+    width:100%;
+  }
+  .glass-card,
+  .stat-box,
+  .admin-card{
+    border-radius:18px;
+  }
+}
+/* ========================================
+   🌙 ADMIN DARK MODE
+======================================== */
+
+body.dark-mode .admin-page{
+  background:#0f172a;
+}
+
+body.dark-mode .admin-sidebar{
+  background:#081120;
+}
+
+body.dark-mode .admin-top h1,
+body.dark-mode .admin-table-box h2,
+body.dark-mode .admin-card h3{
+  color:white;
+}
+
+body.dark-mode .admin-top p{
+  color:#cbd5e1;
+}
+
+body.dark-mode .admin-card,
+body.dark-mode .report-card,
+body.dark-mode .admin-table-box,
+body.dark-mode .queue-group{
+  background:#1e293b;
+  color:white;
+}
+
+body.dark-mode .admin-card p,
+body.dark-mode .report-card p{
+  color:#93c5fd;
+}
+
+body.dark-mode .admin-queue-item{
+  background:#334155;
+  border-color:#475569;
+  color:white;
+}
+
+body.dark-mode .queue-group h3{
+  color:#bfdbfe;
+}
+
+body.dark-mode .admin-search{
+  background:#334155;
+  color:white;
+  border-color:#475569;
+}
