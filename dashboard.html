@@ -3,6 +3,7 @@
 <head>
   <title>Dashboard</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="design-system.css">
 </head>
 <body>
 
@@ -10,7 +11,7 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-
+  
     <h2>🌸 Queue</h2>
 
     <a href="#top">🏠 Home</a>
@@ -151,6 +152,38 @@
 </div>
 
 <script>
+  function toggleTheme(){
+
+  document.body.classList.toggle(
+    "dark-mode"
+  );
+
+  const darkEnabled =
+    document.body.classList.contains(
+      "dark-mode"
+    );
+
+  localStorage.setItem(
+    "campusTheme",
+    darkEnabled ? "dark" : "light"
+  );
+}
+
+function loadTheme(){
+
+  const saved =
+    localStorage.getItem(
+      "campusTheme"
+    );
+
+  if(saved === "dark"){
+    document.body.classList.add(
+      "dark-mode"
+    );
+  }
+}
+
+loadTheme();
 function changeOffice() {
 
   const office =
@@ -172,7 +205,7 @@ async function bookToken() {
     localStorage.getItem("studentEmail");
 
   const response = await fetch(
-    "http://localhost:5000/api/tokens/book",
+    "/api/tokens/book",
     {
       method: "POST",
       headers:{
@@ -244,7 +277,7 @@ async function expireToken() {
     document.getElementById("result").innerText;
 
   await fetch(
-    "http://localhost:5000/api/tokens/expire",
+    "/api/tokens/expire",
     {
       method: "PUT",
       headers:{
@@ -265,7 +298,7 @@ async function cancelMyBooking() {
     localStorage.getItem("studentEmail");
 
   await fetch(
-    "http://localhost:5000/api/tokens/studentcancel",
+    "/api/tokens/studentcancel",
     {
       method: "PUT",
       headers:{
@@ -342,7 +375,7 @@ function loadAnnouncement() {
 async function viewQueue() {
 
   const response = await fetch(
-    "http://localhost:5000/api/tokens/all"
+    "/api/tokens/all"
   );
 
   const data = await response.json();
