@@ -14,7 +14,7 @@ body{
     rgba(40,28,88,0.58) 62%,
     rgba(40,28,88,0.35) 100%
   ),
-  url("images/background.png");
+ url("./images/background.png")
 
   background-size: cover;
   background-position: right center;
