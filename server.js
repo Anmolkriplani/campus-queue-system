@@ -1,11 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const connectDB = require("./config/db");
 
-const connectDB = require("./db");
-
-const userRoutes = require("./userRoutes");
-const tokenRoutes = require("./tokenRoutes");
+const userRoutes = require("./routes/userRoutes");
+const tokenRoutes = require("./routes/tokenRoutes");
 
 const app = express();
 
@@ -14,18 +13,21 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
+/* API Routes */
 app.use("/api/users", userRoutes);
 app.use("/api/tokens", tokenRoutes);
 
-/* Static frontend */
-app.use(express.static(__dirname));
+/* Frontend Static Files */
+app.use(express.static(path.join(__dirname, "public")));
 
+/* Home Page */
 app.get("/", (req, res) => {
   res.sendFile(
-    path.join(__dirname, "index.html")
+    path.join(__dirname, "public", "portal.html")
   );
 });
 
+/* Dynamic Port */
 const PORT =
   process.env.PORT || 5000;
 
