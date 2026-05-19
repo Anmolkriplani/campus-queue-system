@@ -3,6 +3,7 @@
 <head>
   <title>Login</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="design-system.css">
 </head>
 <body>
 
@@ -18,7 +19,7 @@
       check token status and save time.
     </p>
 
-    <img src="images/girl.png" class="auth-girl">
+    <img src="./images/girl.png" class="auth-girl">
 
   </div>
 
@@ -53,7 +54,7 @@ async function loginUser() {
 
   try {
 
-    const response = await fetch("http://localhost:5000/api/users/login", {
+    const response = await fetch("/api/users/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
